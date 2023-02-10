@@ -203,7 +203,7 @@ void Game::LoadLevel(int level)
 	assetManager->AddTexture(renderer, "chopper-image", "assets/images/chopper-spritesheet.png");
 	assetManager->AddTexture(renderer, "radar-image", "assets/images/radar.png");
 	assetManager->AddTexture(renderer, "bullet-image", "assets/images/bullet.png");
-	assetManager->AddTexture(renderer, "tree-image", "assets/images/tree.png");
+	assetManager->AddTexture(renderer, "tree-image", "assets/images/truck-ford-down.png");
 	assetManager->AddFont("charriot-font", "assets/fonts/charriot.ttf", 20);
 	assetManager->AddFont("arial-font", "assets/fonts/arial.ttf", 10);
 	// Load the tilemap
