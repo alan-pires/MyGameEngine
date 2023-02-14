@@ -184,28 +184,11 @@ void	Game::ProcessInput()
 
 void Game::LoadLevel(int level) 
 {
-    // Add the sytems that need to be processed in our game
-    registry->AddSystem<MovementSystem>();
-    registry->AddSystem<RenderSystem>();
-	registry->AddSystem<AnimationSystem>();
-	registry->AddSystem<CollisionSystem>();
-	registry->AddSystem<DebugCollisionSystem>();
-	registry->AddSystem<DamageSystem>();
-	registry->AddSystem<KeyBoardMovementSystem>();
-	registry->AddSystem<CameraMovementSystem>();
-	registry->AddSystem<ProjectileEmitSystem>();
-	registry->AddSystem<ProjectileLifecycleSystem>();
-	registry->AddSystem<RenderTextSystem>();
-	registry->AddSystem<RenderHealthSystem>();
+	AddSystems();
+	AddTextures();
+	AddFonts();
 
-	assetManager->AddTexture(renderer, "tilemap-image", "assets/tilemaps/jungle.png");
-	assetManager->AddTexture(renderer, "tank-image", "assets/images/tank-panther-left.png");
-	assetManager->AddTexture(renderer, "chopper-image", "assets/images/chopper-spritesheet.png");
-	assetManager->AddTexture(renderer, "radar-image", "assets/images/radar.png");
-	assetManager->AddTexture(renderer, "bullet-image", "assets/images/bullet.png");
-	assetManager->AddTexture(renderer, "tree-image", "assets/images/truck-ford-down.png");
-	assetManager->AddFont("charriot-font", "assets/fonts/charriot.ttf", 20);
-	assetManager->AddFont("arial-font", "assets/fonts/arial.ttf", 10);
+
 	// Load the tilemap
     int tileSize = 32;
     double tileScale = 1.5;
@@ -298,6 +281,39 @@ void Game::LoadLevel(int level)
 	Entity label = registry->CreateEntity();
 	SDL_Color white = { 255, 255, 255 };
 	label.AddComponent<TextLabelComponent>(glm::vec2(windowWidth / 2 - 40, 10), "CHOPPER 1.0", "charriot-font", white, true); 
+}
+
+void	Game::AddTextures()
+{
+	assetManager->AddTexture(renderer, "tilemap-image", "assets/tilemaps/jungle.png");
+	assetManager->AddTexture(renderer, "tank-image", "assets/images/tank-panther-left.png");
+	assetManager->AddTexture(renderer, "chopper-image", "assets/images/chopper-spritesheet.png");
+	assetManager->AddTexture(renderer, "radar-image", "assets/images/radar.png");
+	assetManager->AddTexture(renderer, "bullet-image", "assets/images/bullet.png");
+	assetManager->AddTexture(renderer, "tree-image", "assets/images/tree.png");
+}
+
+void	Game::AddFonts()
+{
+	assetManager->AddFont("charriot-font", "assets/fonts/charriot.ttf", 20);
+	assetManager->AddFont("arial-font", "assets/fonts/arial.ttf", 10);
+}
+
+// Add the sytems that need to be processed in our game
+void	Game::AddSystems()
+{
+	registry->AddSystem<MovementSystem>();
+	registry->AddSystem<RenderSystem>();
+	registry->AddSystem<AnimationSystem>();
+	registry->AddSystem<CollisionSystem>();
+	registry->AddSystem<DebugCollisionSystem>();
+	registry->AddSystem<DamageSystem>();
+	registry->AddSystem<KeyBoardMovementSystem>();
+	registry->AddSystem<CameraMovementSystem>();
+	registry->AddSystem<ProjectileEmitSystem>();
+	registry->AddSystem<ProjectileLifecycleSystem>();
+	registry->AddSystem<RenderTextSystem>();
+	registry->AddSystem<RenderHealthSystem>();
 }
 
 

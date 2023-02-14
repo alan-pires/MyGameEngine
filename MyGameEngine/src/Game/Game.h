@@ -34,6 +34,9 @@ class Game
 		void	Destroy();
 		void	Setup();
 		void	LoadLevel(int level);
+		void	AddTextures();
+		void	AddFonts();
+		void	AddSystems();
 
 		static int windowWidth;
 		static int windowHeight;
