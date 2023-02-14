@@ -153,8 +153,8 @@ void	Game::ProcessInput()
 				eventManager->emitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
 				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 					isRunning = false;
-				if (sdlEvent.key.keysym.sym == SDLK_d)
-					debugCollision = !debugCollision;
+				//if (sdlEvent.key.keysym.sym == SDLK_d)
+				//	debugCollision = !debugCollision;
 				break;
 			case SDL_KEYUP:
 				eventManager->emitEvent<KeyReleasedEvent>(sdlEvent.key.keysym.sym);
@@ -187,54 +187,9 @@ void Game::LoadLevel(int level)
 	AddSystems();
 	AddTextures();
 	AddFonts();
+	LoadTileMap("assets/tilemaps/jungle.map");	
 
-
-	// Load the tilemap
-    int tileSize = 32;
-    double tileScale = 1.5;
-    int mapNumCols = 1;
-    static int mapNumRows = 0;
-	std::string fileRow = "";
-	size_t pos = 0;
-
-    std::fstream mapFile;
-    mapFile.open("assets/tilemaps/jungle.map");
-	
-	while (getline(mapFile, fileRow))
-	{
-		while (pos < fileRow.size())
-		{
-			char ch;
-			mapFile.get(ch);
-			if (ch == ',')
-				mapNumCols++;
-			pos++;
-		}
-		mapNumRows++;
-	}
-	mapFile.close();
-
-	mapFile.open("assets/tilemaps/jungle.map");
-    for (int y = 0; y < mapNumRows; y++) {
-        for (int x = 0; x < mapNumCols; x++) {
-            char ch;
-            mapFile.get(ch);
-            int srcRectY = std::atoi(&ch) * tileSize;
-            mapFile.get(ch);
-            int srcRectX = std::atoi(&ch) * tileSize;
-            mapFile.ignore();
-
-            Entity tile = registry->CreateEntity();
-			tile.setGroup("tiles");
-            tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-            tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
-        }
-    }
-    mapFile.close();
-
-	mapWidth = mapNumCols * tileSize * tileScale;
-	mapHeight = mapNumRows * tileSize * tileScale;
-
+	// Create a way to add these entities by functions, try to reuse this function if possible.
 	Entity chopper = registry->CreateEntity();
 	chopper.setTag("player");
 	chopper.AddComponent<TransformComponent>(glm::vec2(20.0, 20.0), glm::vec2(1.0, 1.0), 0.0);
@@ -281,6 +236,54 @@ void Game::LoadLevel(int level)
 	Entity label = registry->CreateEntity();
 	SDL_Color white = { 255, 255, 255 };
 	label.AddComponent<TextLabelComponent>(glm::vec2(windowWidth / 2 - 40, 10), "CHOPPER 1.0", "charriot-font", white, true); 
+}
+
+void	Game::LoadTileMap(std::string path)
+{
+	int tileSize = 32;
+	double tileScale = 1.5;
+	int mapNumCols = 1;
+	static int mapNumRows = 0;
+	std::string fileRow = "";
+	size_t pos = 0;
+	
+	std::fstream mapFile;
+	mapFile.open(path);
+
+	while (getline(mapFile, fileRow))
+	{
+		while (pos < fileRow.size())
+		{
+			char ch;
+			mapFile.get(ch);
+			if (ch == ',')
+				mapNumCols++;
+			pos++;
+		}
+		mapNumRows++;
+	}
+	mapFile.close();
+
+	mapFile.open("assets/tilemaps/jungle.map");
+	for (int y = 0; y < mapNumRows; y++) {
+		for (int x = 0; x < mapNumCols; x++) {
+			char ch;
+			mapFile.get(ch);
+			int srcRectY = std::atoi(&ch) * tileSize;
+			mapFile.get(ch);
+			int srcRectX = std::atoi(&ch) * tileSize;
+			mapFile.ignore();
+
+			Entity tile = registry->CreateEntity();
+			tile.setGroup("tiles");
+			tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
+			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
+		}
+	}
+	mapFile.close();
+
+	mapWidth = mapNumCols * tileSize * tileScale;
+	mapHeight = mapNumRows * tileSize * tileScale;
 }
 
 void	Game::AddTextures()
@@ -357,10 +360,11 @@ void	Game::Render()
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
 	SDL_RenderClear(renderer);
 
-	// Invoke all the sysems that need to render
+	// Invoke all the systems that need to render
 	registry->GetSystem<RenderSystem>().Update(renderer, assetManager, camera);
 	registry->GetSystem<RenderTextSystem>().Update(renderer, assetManager, camera);
 	registry->GetSystem<RenderHealthSystem>().Update(renderer, assetManager, camera);
+
 	if (debugCollision)
 	{
 		registry->GetSystem<DebugCollisionSystem>().Update(renderer, camera);

@@ -37,6 +37,7 @@ class Game
 		void	AddTextures();
 		void	AddFonts();
 		void	AddSystems();
+		void	LoadTileMap(std::string path);
 
 		static int windowWidth;
 		static int windowHeight;
