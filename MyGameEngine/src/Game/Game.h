@@ -40,6 +40,10 @@ class Game
 		void	Destroy();
 		void	Setup();
 		void	LoadLevel(int level);
+		void	AddTextures();
+		void	AddFonts();
+		void	AddSystems();
+		void	LoadTileMap(std::string path);
 
 		static int windowWidth;
 		static int windowHeight;

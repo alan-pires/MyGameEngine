@@ -1,10 +1,10 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
+#include <SDL.h>
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
-#include <SDL.h>
 #include "../AssetManager/AssetManager.h"
 
 class RenderSystem : public System
@@ -49,7 +49,6 @@ class RenderSystem : public System
 					return r1.spriteComp.z < r2.spriteComp.z;
 			});
 
-			// for (auto entity: GetSystemEntities())
 			for (auto entity: renderableEntities)
 			{
 				const auto transform = entity.transfComp;
