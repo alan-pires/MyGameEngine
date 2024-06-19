@@ -7,6 +7,7 @@
 #include <imgui/imgui.h>
 //#include <imgui/imgui_impl_sdl.h>
 //#include <imgui/imgui_impl_sdlrenderer.h>
+#include <imgui/imgui_sdl.h>
 #include <sol/sol.hpp>
 #include "../Systems/MovementSystem.h"
 #include "../Systems/DamageSystem.h"
@@ -254,13 +255,13 @@ void Game::LoadLevel(int level)
 
 	Entity chopper = registry->CreateEntity();
 	chopper.setTag("player");
-	chopper.AddComponent<TransformComponent>(glm::vec2(20.0, 20.0), glm::vec2(1.0, 1.0), 0.0);
+	chopper.AddComponent<TransformComponent>(glm::vec2(100.0, 200.0), glm::vec2(1.0, 1.0), 0.0);
 	chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 3);
 	chopper.AddComponent<AnimationComponent>(2, 10, true);
 	chopper.AddComponent<BoxColliderComponent>(32, 32);
 	chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 4000, 30, true);
-	chopper.AddComponent<KeyBoardControlledComponent>(glm::vec2(0, -100), glm::vec2(100, 0), glm::vec2(0, 100), glm::vec2(-100, 0));
+	chopper.AddComponent<KeyBoardControlledComponent>(0, 0, PI/2, 20.0, 45 * (PI/180));
 	chopper.AddComponent<CameraFollowComponent>();
 	chopper.AddComponent<HealthComponent>(100);
 	chopper.AddComponent<TextLabelComponent>(glm::vec2(0), "", "arial-font");
@@ -317,6 +318,7 @@ void	Game::Update()
 
 	eventManager->Reset();
 
+	// URGENTE
 	// TODO - Take this off this Update Function, subscriptions should only happen once in a setup
 	// part of the code, not inside a loop thousand of times.
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
@@ -326,6 +328,7 @@ void	Game::Update()
 
 	//Ask all the systems to update
 	registry->GetSystem<MovementSystem>().Update(deltaT);
+	registry->GetSystem<KeyBoardMovementSystem>().Update(deltaT);
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().Update(registry);

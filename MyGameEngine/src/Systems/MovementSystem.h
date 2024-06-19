@@ -63,32 +63,24 @@ class MovementSystem : public System
 		{
 			for (auto entity : GetSystemEntities())
 			{
-				auto& transform = entity.GetComponent<TransformComponent>();
-				const auto rigidbody = entity.GetComponent<RigidBodyComponent>();
-				transform.position.x += rigidbody.velocity.x * deltaT;
-				transform.position.y += rigidbody.velocity.y * deltaT;
+				if (!entity.HasTag("player"))  // soluçao provisoria para nao afetar movimento do player. Arrumar
+				{
+					auto& transform = entity.GetComponent<TransformComponent>();
+					const auto rigidbody = entity.GetComponent<RigidBodyComponent>();
+					transform.position.x += rigidbody.velocity.x * deltaT;
+					transform.position.y += rigidbody.velocity.y * deltaT;
 
-				if (entity.HasTag("player")) {
-					int paddingLeft = 10;
-					int paddingTop = 10;
-					int paddingRight = 50;
-					int paddingBottom = 50;
-					transform.position.x = transform.position.x < paddingLeft ? paddingLeft : transform.position.x;
-					transform.position.x = transform.position.x > Game::mapWidth - paddingRight ? Game::mapWidth - paddingRight : transform.position.x;
-					transform.position.y = transform.position.y < paddingTop ? paddingTop : transform.position.y;
-					transform.position.y = transform.position.y > Game::mapHeight - paddingBottom ? Game::mapHeight - paddingBottom : transform.position.y;
+					int margin = 100;
+					bool isEntityOutsideMap = {
+						transform.position.x < -margin ||
+						transform.position.x > Game::mapWidth + margin ||
+						transform.position.y < -margin ||
+						transform.position.y > Game::mapHeight + margin
+					};
+
+					if (isEntityOutsideMap)
+						entity.Kill();
 				}
-
-				int margin = 100;
-				bool isEntityOutsideMap = {
-					transform.position.x < -margin ||
-					transform.position.x > Game::mapWidth + margin ||
-					transform.position.y < -margin ||
-					transform.position.y > Game::mapHeight + margin
-				};
-
-				if (isEntityOutsideMap && !entity.HasTag("player"))
-					entity.Kill();
 			}
 		}
 };

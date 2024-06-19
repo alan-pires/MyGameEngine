@@ -5,17 +5,19 @@
 
 struct KeyBoardControlledComponent
 {
-	glm::vec2 upVelocity;
-	glm::vec2 rightVelocity;
-	glm::vec2 downVelocity;
-	glm::vec2 leftVelocity;
+	int turnDirection; // -1 for left, +1 for right
+	int walkDirection; // -1 for back, +1 for front
+	float rotationAngle;
+	float walkSpeed;
+	float turnSpeed;
 
-	KeyBoardControlledComponent(glm::vec2 upVelocity = glm::vec2(0), glm::vec2 rightVelocity = glm::vec2(0), glm::vec2 downVelocity = glm::vec2(0), glm::vec2 leftVelocity = glm::vec2(0))
+	KeyBoardControlledComponent(int turnDirection = 0, int walkDirection = 0, float rotationAngle = 0.0, float walkSpeed = 0.0, float turnSpeed = 0.0)
 	{
-		this->upVelocity = upVelocity;
-		this->rightVelocity = rightVelocity;
-		this->downVelocity = downVelocity;
-		this->leftVelocity = leftVelocity;
+		this->turnDirection = turnDirection;
+		this->walkDirection = walkDirection;
+		this->rotationAngle = rotationAngle;
+		this->walkSpeed = walkSpeed;
+		this->turnSpeed = turnSpeed;
 	}
 };
 

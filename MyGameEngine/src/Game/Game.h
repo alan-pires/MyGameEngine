@@ -5,6 +5,12 @@
 #include "../AssetManager/AssetManager.h"
 #include "../EventManager/EventManager.h"
 
+#define FOV_ANGLE (60 * (PI / 180))
+#define PI 3.14159265
+#define TWO_PI 6.28318530
+
+// #define NUM_RAYS WINDOW_WIDTH
+
 const int FPS = 30;
 const int MILLISECS_PER_FRAME = 1000/FPS;
 

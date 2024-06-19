@@ -8,6 +8,7 @@
 #include "../Components/SpriteComponent.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Events/KeyReleasedEvent.h"
+#include <math.h>
 
 class KeyBoardMovementSystem : public System
 {
@@ -15,79 +16,127 @@ class KeyBoardMovementSystem : public System
 		KeyBoardMovementSystem()
 		{
 			RequireComponent<KeyBoardControlledComponent>();
-			RequireComponent<RigidBodyComponent>();
 			RequireComponent<SpriteComponent>();
+			RequireComponent<TransformComponent>();
 		}
 		~KeyBoardMovementSystem() = default;
 
 		void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
 		{
 			eventManager->SubscribeToEvent<KeyPressedEvent>(this, &KeyBoardMovementSystem::onKeyPressedEvent);
-			//eventManager->SubscribeToEvent<KeyReleasedEvent>(this, &KeyBoardMovementSystem::onKeyReleased);
+			eventManager->SubscribeToEvent<KeyReleasedEvent>(this, &KeyBoardMovementSystem::onKeyReleased);
 		}
 
 		void onKeyPressedEvent(KeyPressedEvent& e)
 		{
-			for (auto entity: GetSystemEntities())
+			for (auto& entity: GetSystemEntities())
 			{
-				const auto keyboardControl = entity.GetComponent<KeyBoardControlledComponent>();
+				auto& keyboardControled = entity.GetComponent<KeyBoardControlledComponent>();
+				auto& transform = entity.GetComponent<TransformComponent>();
 				auto& sprite = entity.GetComponent<SpriteComponent>();
-				auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
 
 				switch (e.symbol)
 				{
 					case SDLK_UP:
-						rigidBody.velocity = keyboardControl.upVelocity;
-						sprite.srcRect.y = sprite.height * 0;
+						keyboardControled.walkDirection = +1;
+						//sprite.srcRect.y = sprite.height * 0;
 						break;
 					case SDLK_RIGHT:
-						rigidBody.velocity = keyboardControl.rightVelocity;
-						sprite.srcRect.y = sprite.height * 1;
+						keyboardControled.turnDirection = +1;
+						//sprite.srcRect.y = sprite.height * 1;
 						break;
 					case SDLK_DOWN:
-						rigidBody.velocity = keyboardControl.downVelocity;
-						sprite.srcRect.y = sprite.height * 2;
+						keyboardControled.walkDirection = -1;
+						//sprite.srcRect.y = sprite.height * 2;
 						break;
 					case SDLK_LEFT:
-						rigidBody.velocity = keyboardControl.leftVelocity;
-						sprite.srcRect.y = sprite.height * 3;
+						keyboardControled.turnDirection = -1;
+						//sprite.srcRect.y = sprite.height * 3;
 						break;
 				}
 
-					/*switch (e.code)
-					{
-					case SDL_SCANCODE_UP:
-						rigidBody.velocity = keyboardControl.upVelocity;
-						sprite.srcRect.y = sprite.height * 0;
-						break;
-					case SDL_SCANCODE_RIGHT:
-						rigidBody.velocity = keyboardControl.rightVelocity;
-						sprite.srcRect.y = sprite.height * 1;
-						break;
-					case SDL_SCANCODE_DOWN:
-						rigidBody.velocity = keyboardControl.downVelocity;
-						sprite.srcRect.y = sprite.height * 2;
-						break;
-					case SDL_SCANCODE_LEFT:
-						rigidBody.velocity = keyboardControl.leftVelocity;
-						sprite.srcRect.y = sprite.height * 3;
-						break;
-					}*/
+				if (entity.HasTag("player"))
+				{
+					keyboardControled.rotationAngle += keyboardControled.turnDirection * keyboardControled.turnSpeed; // * deltaT
+
+					float moveStep = keyboardControled.walkDirection * keyboardControled.walkSpeed;
+
+					//float newPlayerX = cos(keyboardControled.rotationAngle) * moveStep;
+					//float newPlayerY = sin(keyboardControled.rotationAngle) * moveStep;
+
+					//transform.position.x = newPlayerX;
+					//transform.position.y = newPlayerY;
+
+					transform.position.x += cos(keyboardControled.rotationAngle) * moveStep;
+					transform.position.y += sin(keyboardControled.rotationAngle) * moveStep;
+
+					int paddingLeft = 10;
+					int paddingTop = 10;
+					int paddingRight = 50;
+					int paddingBottom = 50;
+
+					transform.position.x = transform.position.x < paddingLeft ? paddingLeft : transform.position.x;
+					transform.position.x = transform.position.x > Game::mapWidth - paddingRight ? Game::mapWidth - paddingRight : transform.position.x;
+					transform.position.y = transform.position.y < paddingTop ? paddingTop : transform.position.y;
+					transform.position.y = transform.position.y > Game::mapHeight - paddingBottom ? Game::mapHeight - paddingBottom : transform.position.y;
+				}
 			}
 		}
 
 		void onKeyReleased(KeyReleasedEvent &e)
 		{
-			for (auto entity: GetSystemEntities())
+			for (auto& entity: GetSystemEntities())
 			{
-				auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
-				rigidBody.velocity = glm::vec2(0.0);
+				auto& keyboardControl = entity.GetComponent<KeyBoardControlledComponent>();
+
+				switch (e.symbol)
+				{
+				case SDLK_UP:
+					keyboardControl.walkDirection = 0;
+					break;
+				case SDLK_RIGHT:
+					keyboardControl.turnDirection = 0;
+					break;
+				case SDLK_DOWN:
+					keyboardControl.walkDirection = 0;
+					break;
+				case SDLK_LEFT:
+					keyboardControl.turnDirection = 0;
+					break;
+				}
 			}
 		}
 
-		void Update()
+		void Update(double deltaT)
 		{
-			
+			/*for (auto entity : GetSystemEntities())
+			{
+				if (entity.HasTag("player"))  
+				{
+					auto& keyboardControled = entity.GetComponent<KeyBoardControlledComponent>();
+					auto& transform = entity.GetComponent<TransformComponent>();
+					
+					keyboardControled.rotationAngle += keyboardControled.turnDirection * keyboardControled.turnSpeed * deltaT;
+					
+					float moveStep = keyboardControled.walkDirection * keyboardControled.walkSpeed;
+
+					float newPlayerX = cos(keyboardControled.rotationAngle) * moveStep;
+					float newPlayerY = sin(keyboardControled.rotationAngle) * moveStep;
+
+					transform.position.x = newPlayerX;
+					transform.position.y = newPlayerY;
+
+					int paddingLeft = 10;
+					int paddingTop = 10;
+					int paddingRight = 50;
+					int paddingBottom = 50;
+
+					transform.position.x = transform.position.x < paddingLeft ? paddingLeft : transform.position.x;
+					transform.position.x = transform.position.x > Game::mapWidth - paddingRight ? Game::mapWidth - paddingRight : transform.position.x;
+					transform.position.y = transform.position.y < paddingTop ? paddingTop : transform.position.y;
+					transform.position.y = transform.position.y > Game::mapHeight - paddingBottom ? Game::mapHeight - paddingBottom : transform.position.y;
+				}
+			}*/
 		}
 };
 
