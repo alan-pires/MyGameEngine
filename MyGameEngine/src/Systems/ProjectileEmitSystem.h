@@ -30,8 +30,7 @@ public:
 
 	void onKeyPressed(KeyPressedEvent &e)
 	{
-		//if (e.code == SDL_SCANCODE_SPACE)
-		if (e.symbol == SDLK_SPACE)
+		if (e.code == SDL_SCANCODE_SPACE)
 		{
 			for (auto entity : GetSystemEntities())
 			{

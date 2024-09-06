@@ -130,7 +130,7 @@ void	Game::Run()
 void	Game::ProcessInput()
 {
 	SDL_Event sdlEvent;
-	//const Uint8* keys = SDL_GetKeyboardState(NULL);
+	const Uint8* keys = SDL_GetKeyboardState(NULL);
 
 	while(SDL_PollEvent(&sdlEvent))
 	{
@@ -145,41 +145,37 @@ void	Game::ProcessInput()
 		//io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 
 		// Handle core SDL events
-		switch (sdlEvent.type)
-		{
-			case SDL_QUIT:
-				isRunning = false;
-				break;
-			case SDL_KEYDOWN:
-				eventManager->emitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
-				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
-					isRunning = false;
-				//if (sdlEvent.key.keysym.sym == SDLK_d)
-				//	debugCollision = !debugCollision;
-				break;
-			case SDL_KEYUP:
-				eventManager->emitEvent<KeyReleasedEvent>(sdlEvent.key.keysym.sym);
-			default:
-				break;
-		}
+		//switch (sdlEvent.type)
+		//{
+		//	case SDL_QUIT:
+		//		isRunning = false;
+		//		break;
+		//	case SDL_KEYDOWN:
+		//		eventManager->emitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
+		//		if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+		//			isRunning = false;
+		//		//if (sdlEvent.key.keysym.sym == SDLK_d)
+		//		//	debugCollision = !debugCollision;
+		//		break;
+		//	default:
+		//		break;
+		//}
 
 		// TODO
 		//if (keys[SDL_SCANCODE_ESCAPE])
 		//	isRunning = false;
 		//else
 		//	eventManager->emitEvent<KeyReleasedEvent>(SDL_SCANCODE_ESCAPE);
-
-		//if (keys[SDL_SCANCODE_UP])
-		//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_UP);
-		//if (keys[SDL_SCANCODE_RIGHT])
-		//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_RIGHT);
-		//if (keys[SDL_SCANCODE_DOWN])
-		//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_DOWN);
-		//if (keys[SDL_SCANCODE_LEFT])
-		//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_LEFT);
-
-		//if (keys[SDL_SCANCODE_SPACE])
-		//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_SPACE);
+		if (keys[SDL_SCANCODE_ESCAPE])
+			isRunning = false;
+		if (keys[SDL_SCANCODE_UP])
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_UP);
+		if (keys[SDL_SCANCODE_RIGHT])
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_RIGHT);
+		if (keys[SDL_SCANCODE_DOWN])
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_DOWN);
+		if (keys[SDL_SCANCODE_LEFT])
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_LEFT);
 	}
 }
 
@@ -188,7 +184,9 @@ void Game::LoadLevel(int level)
 	AddSystems();
 	AddTextures();
 	AddFonts();
-	LoadTileMap("assets/tilemaps/jungle.map");	
+	//LoadTileMap("assets/tilemaps/jungle.map");	
+	mapWidth = 1200;
+	mapHeight = 960;
 
 	// Create a way to add these entities by functions, try to reuse this function if possible.
 	Entity chopper = registry->CreateEntity();
@@ -199,7 +197,7 @@ void Game::LoadLevel(int level)
 	chopper.AddComponent<AnimationComponent>(2, 10, true);
 	chopper.AddComponent<BoxColliderComponent>(32, 32);
 	chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 4000, 30, true);
-	chopper.AddComponent<KeyBoardControlledComponent>(0, 0, PI/2, 20.0, 45 * (PI/180));
+	chopper.AddComponent<KeyBoardControlledComponent>(0.0, 200.0f, 10.0f);
 	chopper.AddComponent<CameraFollowComponent>();
 	chopper.AddComponent<HealthComponent>(100);
 	chopper.AddComponent<TextLabelComponent>(glm::vec2(0), "", "arial-font");
@@ -291,7 +289,8 @@ void	Game::AddTextures()
 {
 	assetManager->AddTexture(renderer, "tilemap-image", "assets/tilemaps/jungle.png");
 	assetManager->AddTexture(renderer, "tank-image", "assets/images/tank-panther-left.png");
-	assetManager->AddTexture(renderer, "chopper-image", "assets/images/chopper-spritesheet.png");
+	assetManager->AddTexture(renderer, "chopper-image", "assets/images/chopper.png");
+	assetManager->AddTexture(renderer, "chopper-spritesheet", "assets/images/chopper-spritesheet.png");
 	assetManager->AddTexture(renderer, "radar-image", "assets/images/radar.png");
 	assetManager->AddTexture(renderer, "bullet-image", "assets/images/bullet.png");
 	assetManager->AddTexture(renderer, "tree-image", "assets/images/tree.png");
