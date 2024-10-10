@@ -15,26 +15,18 @@
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/DebugCollisionSystem.h"
-#include "../Systems/KeyBoardMovementSystem.h"
+#include "../Systems/KeyBoardMovementSystem_v1.h"
+#include "../Systems/KeyBoardMovementSystem_v2.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
 #include "../Systems/ProjectileLifecycleSystem.h"
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/RenderHealthSystem.h"
-#include "../Components/TransformComponent.h"
-#include "../Components/RigidBodyComponent.h"
-#include "../Components/SpriteComponent.h"
-#include "../Components/AnimationComponent.h"
-#include "../Components/BoxColliderComponent.h"
-#include "../Components/KeyBoardControlledComponent.h"
-#include "../Components/CameraFollowComponent.h"
-#include "../Components/ProjectileEmitterComponent.h"
-#include "../Components/HealthComponent.h"
-#include "../Components/TextLabelComponent.h"
+#include "../Systems/ScriptSystem.h"
 #include <iostream>
-#include <fstream>
 #include <set>
 #include "../Logger/Logger.h"
+#include "LevelLoader.h"
 
 int Game::windowHeight;
 int Game::windowWidth;
@@ -73,7 +65,7 @@ void	Game::Initialize()
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 	windowWidth = 800;
-	windowHeight = 600; 
+	windowHeight = 600;
 
 	window = SDL_CreateWindow(
 		"Engine",
@@ -144,162 +136,19 @@ void	Game::ProcessInput()
 		//io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 		//io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 
-		// Handle core SDL events
-		//switch (sdlEvent.type)
-		//{
-		//	case SDL_QUIT:
-		//		isRunning = false;
-		//		break;
-		//	case SDL_KEYDOWN:
-		//		eventManager->emitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
-		//		if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
-		//			isRunning = false;
-		//		//if (sdlEvent.key.keysym.sym == SDLK_d)
-		//		//	debugCollision = !debugCollision;
-		//		break;
-		//	default:
-		//		break;
-		//}
-
-		// TODO
-		//if (keys[SDL_SCANCODE_ESCAPE])
-		//	isRunning = false;
-		//else
-		//	eventManager->emitEvent<KeyReleasedEvent>(SDL_SCANCODE_ESCAPE);
 		if (keys[SDL_SCANCODE_ESCAPE])
 			isRunning = false;
 		if (keys[SDL_SCANCODE_UP])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_UP);
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_UP, keys);
 		if (keys[SDL_SCANCODE_RIGHT])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_RIGHT);
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_RIGHT, keys);
 		if (keys[SDL_SCANCODE_DOWN])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_DOWN);
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_DOWN, keys);
 		if (keys[SDL_SCANCODE_LEFT])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_LEFT);
+			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_LEFT, keys);
+		//if (keys[SDL_SCANCODE_D])
+		//	debugCollision = !debugCollision;
 	}
-}
-
-void Game::LoadLevel(int level) 
-{
-	AddSystems();
-	AddTextures();
-	AddFonts();
-	//LoadTileMap("assets/tilemaps/jungle.map");	
-	mapWidth = 1200;
-	mapHeight = 960;
-
-	// Create a way to add these entities by functions, try to reuse this function if possible.
-	Entity chopper = registry->CreateEntity();
-	chopper.setTag("player");
-	chopper.AddComponent<TransformComponent>(glm::vec2(100.0, 200.0), glm::vec2(1.0, 1.0), 0.0);
-	chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-	chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 3);
-	chopper.AddComponent<AnimationComponent>(2, 10, true);
-	chopper.AddComponent<BoxColliderComponent>(32, 32);
-	chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 4000, 30, true);
-	chopper.AddComponent<KeyBoardControlledComponent>(0.0, 200.0f, 10.0f);
-	chopper.AddComponent<CameraFollowComponent>();
-	chopper.AddComponent<HealthComponent>(100);
-	chopper.AddComponent<TextLabelComponent>(glm::vec2(0), "", "arial-font");
-
-    Entity tank = registry->CreateEntity();
-	tank.setGroup("enemies");
-    tank.AddComponent<TransformComponent>(glm::vec2(400.0, 50.0), glm::vec2(1.0, 1.0), 0.0);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
-    tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
-	tank.AddComponent<BoxColliderComponent>(32, 32);
-	//tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(0, 150.0), 1000, 2000, 30, false);
-	tank.AddComponent<HealthComponent>(100);
-	tank.AddComponent<TextLabelComponent>(glm::vec2(0), "", "arial-font");
-
-	Entity radar = registry->CreateEntity();
-	radar.AddComponent<TransformComponent>(glm::vec2(700.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
-	radar.AddComponent<AnimationComponent>(8, 5, true);
-
-	Entity tree = registry->CreateEntity();
-	tree.setGroup("obstacles");
-	tree.AddComponent<TransformComponent>(glm::vec2(500, 50.0), glm::vec2(1.0, 1.0), 0.0);
-	tree.AddComponent<SpriteComponent>("tree-image", 16, 32, 2);
-	tree.AddComponent<BoxColliderComponent>(16, 32);
-	//tree.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-
-	Entity tree2 = registry->CreateEntity();
-	tree2.setGroup("obstacles");
-	tree2.AddComponent<TransformComponent>(glm::vec2(300, 45.0), glm::vec2(1.0, 1.0), 0.0);
-	tree2.AddComponent<SpriteComponent>("tree-image", 16, 32, 2);
-	tree2.AddComponent<BoxColliderComponent>(16, 32);
-	//tree2.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-
-	Entity label = registry->CreateEntity();
-	SDL_Color white = { 255, 255, 255 };
-	label.AddComponent<TextLabelComponent>(glm::vec2(windowWidth / 2 - 40, 10), "CHOPPER 1.0", "charriot-font", white, true); 
-}
-
-void	Game::LoadTileMap(std::string path)
-{
-	int tileSize = 32;
-	double tileScale = 1.5;
-	int mapNumCols = 1;
-	static int mapNumRows = 0;
-	std::string fileRow = "";
-	size_t pos = 0;
-	
-	std::fstream mapFile;
-	mapFile.open(path);
-
-	while (getline(mapFile, fileRow))
-	{
-		while (pos < fileRow.size())
-		{
-			char ch;
-			mapFile.get(ch);
-			if (ch == ',')
-				mapNumCols++;
-			pos++;
-		}
-		mapNumRows++;
-	}
-	mapFile.close();
-
-	mapFile.open("assets/tilemaps/jungle.map");
-	for (int y = 0; y < mapNumRows; y++) {
-		for (int x = 0; x < mapNumCols; x++) {
-			char ch;
-			mapFile.get(ch);
-			int srcRectY = std::atoi(&ch) * tileSize;
-			mapFile.get(ch);
-			int srcRectX = std::atoi(&ch) * tileSize;
-			mapFile.ignore();
-
-			Entity tile = registry->CreateEntity();
-			tile.setGroup("tiles");
-			tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
-		}
-	}
-	mapFile.close();
-
-	mapWidth = mapNumCols * tileSize * tileScale;
-	mapHeight = mapNumRows * tileSize * tileScale;
-}
-
-void	Game::AddTextures()
-{
-	assetManager->AddTexture(renderer, "tilemap-image", "assets/tilemaps/jungle.png");
-	assetManager->AddTexture(renderer, "tank-image", "assets/images/tank-panther-left.png");
-	assetManager->AddTexture(renderer, "chopper-image", "assets/images/chopper.png");
-	assetManager->AddTexture(renderer, "chopper-spritesheet", "assets/images/chopper-spritesheet.png");
-	assetManager->AddTexture(renderer, "radar-image", "assets/images/radar.png");
-	assetManager->AddTexture(renderer, "bullet-image", "assets/images/bullet.png");
-	assetManager->AddTexture(renderer, "tree-image", "assets/images/tree.png");
-}
-
-void	Game::AddFonts()
-{
-	assetManager->AddFont("charriot-font", "assets/fonts/charriot.ttf", 20);
-	assetManager->AddFont("arial-font", "assets/fonts/arial.ttf", 10);
 }
 
 // Add the sytems that need to be processed in our game
@@ -311,18 +160,27 @@ void	Game::AddSystems()
 	registry->AddSystem<CollisionSystem>();
 	registry->AddSystem<DebugCollisionSystem>();
 	registry->AddSystem<DamageSystem>();
-	registry->AddSystem<KeyBoardMovementSystem>();
+	registry->AddSystem<KeyBoardMovementSystem_v1>();
+	//registry->AddSystem<KeyBoardMovementSystem_v2>();
 	registry->AddSystem<CameraMovementSystem>();
 	registry->AddSystem<ProjectileEmitSystem>();
 	registry->AddSystem<ProjectileLifecycleSystem>();
 	registry->AddSystem<RenderTextSystem>();
 	registry->AddSystem<RenderHealthSystem>();
+	registry->AddSystem<ScriptSystem>();
 }
 
 
 void	Game::Setup()
 {
-	LoadLevel(1);
+	AddSystems();
+
+	// Create bindings between C++ and Lua
+	registry->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
+
+	LevelLoader loader;
+	lua.open_libraries(sol::lib::base, sol::lib::math);
+	loader.LoadLevel(lua, registry, assetManager, renderer, 1);
 }
 
 void	Game::Update()
@@ -341,17 +199,20 @@ void	Game::Update()
 	// part of the code, not inside a loop thousand of times.
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
 	registry->GetSystem<MovementSystem>().SubscribeToEvents(eventManager);
-	registry->GetSystem<KeyBoardMovementSystem>().SubscribeToEvents(eventManager);
+	registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);
+	//registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventManager);
 
 	//Ask all the systems to update
 	registry->GetSystem<MovementSystem>().Update(deltaT);
-	registry->GetSystem<KeyBoardMovementSystem>().Update(deltaT);
+	registry->GetSystem<KeyBoardMovementSystem_v1>().Update(deltaT);
+	//registry->GetSystem<KeyBoardMovementSystem_v2>().Update(deltaT);
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().Update(registry);
 	registry->GetSystem<CameraMovementSystem>().Update(camera);
 	registry->GetSystem<ProjectileLifecycleSystem>().Update();
+	registry->GetSystem<ScriptSystem>().Update(deltaT, SDL_GetTicks());
 
 	//Update the registry to process the entities that are waiting to be created/killed
 	registry->Update();

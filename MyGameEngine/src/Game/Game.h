@@ -4,6 +4,7 @@
 #include "../ECS/ECS.h"
 #include "../AssetManager/AssetManager.h"
 #include "../EventManager/EventManager.h"
+#include <sol/sol.hpp>
 
 #define FOV_ANGLE (60 * (PI / 180))
 #define PI 3.14159265
@@ -22,6 +23,7 @@ class Game
 		SDL_Rect camera;
 		bool isRunning;
 
+		sol::state lua;
 		std::unique_ptr<Registry> registry;
 		std::unique_ptr<AssetManager> assetManager;
 		std::unique_ptr<EventManager> eventManager;
@@ -39,11 +41,7 @@ class Game
 		void	Render();
 		void	Destroy();
 		void	Setup();
-		void	LoadLevel(int level);
-		void	AddTextures();
-		void	AddFonts();
 		void	AddSystems();
-		void	LoadTileMap(std::string path);
 
 		static int windowWidth;
 		static int windowHeight;

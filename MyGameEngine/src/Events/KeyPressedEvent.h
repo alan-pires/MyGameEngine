@@ -9,10 +9,9 @@ class KeyPressedEvent : public Event
 {
 	public:
 		SDL_Scancode code;
-		//SDL_Keycode symbol;
+		const Uint8* keys;
 
-		//KeyPressedEvent(SDL_Keycode symbol): symbol(symbol){}
-		KeyPressedEvent(SDL_Scancode code) : code(code) {}
+		KeyPressedEvent(SDL_Scancode code, const Uint8* keys) : code(code), keys(keys) {}
 };
 
 #endif

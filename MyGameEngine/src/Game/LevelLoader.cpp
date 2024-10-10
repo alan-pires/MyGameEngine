@@ -6,11 +6,13 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
 #include "../Components/BoxColliderComponent.h"
-#include "../Components/KeyBoardControlledComponent.h"
+#include "../Components/KeyBoardControlledComponent_v1.h"
+#include "../Components/KeyBoardControlledComponent_v2.h"
 #include "../Components/CameraFollowComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Components/TextLabelComponent.h"
+#include "../Components/ScriptComponent.h"
 
 LevelLoader::LevelLoader()
 {
@@ -231,15 +233,34 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 				newEntity.AddComponent<CameraFollowComponent>();
 			}
 
-			// KeyboardControlled
-			sol::optional<sol::table> keyboardControlled = entity["components"]["keyboard_controller"];
-			if (keyboardControlled != sol::nullopt)
+			// KeyboardControlled v1
+			sol::optional<sol::table> keyboardControlled_v1 = entity["components"]["keyboard_controller"];
+			if (keyboardControlled_v1 != sol::nullopt)
 			{
-				newEntity.AddComponent<KeyBoardControlledComponent>(
+				newEntity.AddComponent<KeyBoardControlledComponent_v1>(
 					static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
 					static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
 					static_cast<float>(entity["components"]["keyboard_controller"]["rotationSpeed"].get_or(0.0))
 					);
+			}
+
+			// KeyboardControlled v2
+			sol::optional<sol::table> keyboardControlled_v2 = entity["components"]["keyboard_controller"];
+			if (keyboardControlled_v2 != sol::nullopt)
+			{
+				newEntity.AddComponent<KeyBoardControlledComponent_v2>(
+					static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
+					static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
+					static_cast<float>(entity["components"]["keyboard_controller"]["rotationSpeed"].get_or(0.0))
+					);
+			}
+
+			// Script
+			sol::optional<sol::table> script = entity["components"]["on_update_script"];
+			if (script != sol::nullopt)
+			{
+				sol::function func = entity["components"]["on_update_script"][0];
+				newEntity.AddComponent<ScriptComponent>(func);
 			}
 		}
 		i++;
@@ -258,7 +279,7 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 //chopper.AddComponent<AnimationComponent>(2, 10, true);
 //chopper.AddComponent<BoxColliderComponent>(32, 32);
 //chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 4000, 30, true);
-//chopper.AddComponent<KeyBoardControlledComponent>(0.0, 200.0f, 180.0f);
+//chopper.AddComponent<KeyBoardControlledComponent_v1>(0.0, 200.0f, 180.0f);
 //chopper.AddComponent<CameraFollowComponent>();
 //chopper.AddComponent<HealthComponent>(100);
 //chopper.AddComponent<TextLabelComponent>(glm::vec2(0), "", "arial-font");
