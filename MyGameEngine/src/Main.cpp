@@ -1,10 +1,11 @@
 #include <iostream>
 #include "Game/Game.h"
 #include <sol/sol.hpp>
+#include "TileMapEditor/TileMapEditor.h"
 
 using namespace std;
 
-void GameLoop()
+void GameRun()
 {
 	Game game;
 
@@ -13,10 +14,13 @@ void GameLoop()
 	game.Destroy();
 }
 
-void TileMapEditor()
+void TileMapEditorRun()
 {
-    std::cout << "*** TileMapEditor ***";
-    std::cin.get();
+    TileMapEditor tmap;
+
+    tmap.Initialize();
+    tmap.Run();
+    tmap.Destroy();
 }
 
 int main(int argc, char* argv[])
@@ -26,7 +30,7 @@ int main(int argc, char* argv[])
 
     while (running)
     {
-        std::cout << "Digit 1 for Game and 2 for TileMap Editor or 0 to quit";
+        std::cout << "Enter 1 for Game and 2 for TileMap Editor or 0 to quit";
         std::cin >> option;
 
         if (option == 1 || option == 2 || option == 0)
@@ -34,9 +38,9 @@ int main(int argc, char* argv[])
     }
 
     if (option == 1)
-        GameLoop();
+        GameRun();
     else if (option == 2)
-        TileMapEditor();
+        TileMapEditorRun();
 
 	return 0;
 }
