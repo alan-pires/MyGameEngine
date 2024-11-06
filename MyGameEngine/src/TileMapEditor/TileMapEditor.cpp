@@ -59,8 +59,12 @@ void TileMapEditor::Initialize()
 	{
 		Logger::Err("Error in IMG_Init");
 		return;
+	}
 	isRunning = true;
 }
+
+void TileMapEditor::Setup()
+{
 
 }
 
