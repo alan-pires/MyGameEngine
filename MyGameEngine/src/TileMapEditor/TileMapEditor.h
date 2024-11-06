@@ -3,6 +3,8 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
+#include <SDL/SDL_image.h>
+
 
 class TileMapEditor
 {
@@ -14,12 +16,16 @@ private:
 public:
 	TileMapEditor();
 	~TileMapEditor();
-	void	Initialize();
-	void	Run();
-	void	ProcessInput();
-	void	Update();
-	void	Render();
-	void	Destroy();
+	void Initialize();
+	void Setup();
+	void Run();
+	void ProcessInput();
+	void PrintXY(); // temp
+	void Update();
+	void Render();
+	SDL_Texture* LoadTexture(const char* filePath, SDL_Renderer* renderer);
+	void RenderTileMap();
+	void Destroy();
 	static int windowWidth;
 	static int windowHeight;
 	int mouseX, mouseY;
