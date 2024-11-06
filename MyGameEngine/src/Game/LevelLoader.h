@@ -3,7 +3,7 @@
 #include "../ECS/ECS.h"
 #include "../AssetManager/AssetManager.h"
 #include <memory>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <sol/sol.hpp>
 
 class LevelLoader

@@ -5,7 +5,7 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Components/TransformComponent.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "../AssetManager/AssetManager.h"
 
 class RenderHealthSystem : public System

@@ -3,7 +3,7 @@
 
 #include "../ECS/ECS.h"
 #include "../Components/TextLabelComponent.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "../AssetManager/AssetManager.h"
 
 class RenderTextSystem : public System
