@@ -65,7 +65,16 @@ void TileMapEditor::Initialize()
 
 void TileMapEditor::Setup()
 {
+	tileMapTexture = LoadTexture("./assets/tilemaps/jungle.png", renderer);
+	if (!tileMapTexture)
+	{
+		Logger::Err("Error loading texture");
+		return;
+	}
 
+	tileMapRect = {
+		10, 645, 320, 96
+	};
 }
 
 void TileMapEditor::Run()
@@ -95,16 +104,23 @@ void TileMapEditor::ProcessInput()
 		if (sdlEvent.type == SDL_MOUSEBUTTONDOWN)
 		{
 			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
-				PrintXY();
+				PrintTest();
 		}
 	}
 }
 
-void TileMapEditor::PrintXY()
+void TileMapEditor::PrintTest()
 {
-	Logger::Log("X = " + std::to_string(mouseX));
-	Logger::Log("Y = " + std::to_string(mouseY));
-	SDL_Delay(100);
+	SDL_Point mousePoint = { mouseX, mouseY };
+	for (const auto& [id, rect] : rectMap)
+	{ 
+		if (SDL_PointInRect(&mousePoint, &rect))
+		{
+			Logger::Log("ID: " + std::to_string(id));
+			SDL_Delay(100);
+			break;
+		}
+	}
 }
 
 void TileMapEditor::Update()
@@ -143,21 +159,35 @@ SDL_Texture* TileMapEditor::LoadTexture(const char* filePath, SDL_Renderer* rend
 
 void TileMapEditor::RenderTileMap()
 {
-	//SDL_Rect rect = {
-	//	0, 800, 400, 240
-	//};
-	SDL_Texture* jpgTexture = LoadTexture("./assets/tilemaps/jungle.png", renderer);
-	if (!jpgTexture)
-	{
-		Logger::Err("Error loading texture");
-		return;
-	}
-	SDL_RenderCopy(renderer, jpgTexture, NULL, NULL);
+	int id = 0;
 
+	SDL_RenderCopy(renderer, tileMapTexture, NULL, &tileMapRect);
+
+	//for (int i = 10; i < 330; i += 32)
+	//{
+	//	for (int j = 645; j < 741; j += 32)
+	//	{
+	//		rectMap[id] = {	i, j, 32, 32 };
+	//		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	//		SDL_RenderDrawRect(renderer, &rectMap[id]);
+	//		id++;
+	//	}
+	//}
+	for (int j = 645; j < 741; j += 32)
+	{
+		for (int i = 10; i < 330; i += 32)
+		{
+			rectMap[id] = { i, j, 32, 32 };
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+			SDL_RenderDrawRect(renderer, &rectMap[id]);
+			id++;
+		}
+	}
 }
 
 void TileMapEditor::Destroy()
 {
+	SDL_DestroyTexture(tileMapTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
