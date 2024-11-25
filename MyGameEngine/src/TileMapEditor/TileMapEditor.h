@@ -5,6 +5,7 @@
 #include <SDL_mixer.h>
 #include <SDL_image.h>
 #include <map>
+#include <vector>
 
 class TileMapEditor
 {
@@ -14,7 +15,16 @@ private:
 	bool isRunning;
 	SDL_Texture* tileMapTexture;
 	std::map<int, SDL_Rect> rectMap;
-	SDL_Rect tileMapRect;
+	std::map<int, SDL_Rect> tileMapSources;
+	SDL_Rect mapArea;
+	SDL_Rect tileSelector;
+	std::vector<SDL_Rect> rectEmptyTiles;
+	SDL_Rect selectedRect;
+	int tileWidth = 32;
+	int tileHeight = 32;
+	int textureWidth = 320;
+	int textureHeight = 96;
+	bool isDragging = false;
 
 public:
 	TileMapEditor();
@@ -23,11 +33,12 @@ public:
 	void Setup();
 	void Run();
 	void ProcessInput();
-	void PrintTest(); // temp
 	void Update();
 	void Render();
 	SDL_Texture* LoadTexture(const char* filePath, SDL_Renderer* renderer);
-	void RenderTileMap();
+	void SelectTile();
+	void SetTiletoMap();
+	void RenderTilesToSelect();
 	void Destroy();
 	static int windowWidth;
 	static int windowHeight;
