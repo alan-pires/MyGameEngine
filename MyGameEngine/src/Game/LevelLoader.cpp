@@ -7,7 +7,6 @@
 #include "../Components/AnimationComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/KeyBoardControlledComponent_v1.h"
-#include "../Components/KeyBoardControlledComponent_v2.h"
 #include "../Components/CameraFollowComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/HealthComponent.h"
@@ -238,20 +237,9 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 			if (keyboardControlled_v1 != sol::nullopt)
 			{
 				newEntity.AddComponent<KeyBoardControlledComponent_v1>(
-					static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
+					/*static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
 					static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
-					static_cast<float>(entity["components"]["keyboard_controller"]["rotationSpeed"].get_or(0.0))
-					);
-			}
-
-			// KeyboardControlled v2
-			sol::optional<sol::table> keyboardControlled_v2 = entity["components"]["keyboard_controller"];
-			if (keyboardControlled_v2 != sol::nullopt)
-			{
-				newEntity.AddComponent<KeyBoardControlledComponent_v2>(
-					static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
-					static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
-					static_cast<float>(entity["components"]["keyboard_controller"]["rotationSpeed"].get_or(0.0))
+					static_cast<float>(entity["components"]["keyboard_controller"]["turnSpeed"].get_or(0.0))*/
 					);
 			}
 

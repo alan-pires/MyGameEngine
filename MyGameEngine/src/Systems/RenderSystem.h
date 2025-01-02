@@ -64,6 +64,12 @@ class RenderSystem : public System
 					static_cast<int>(sprite.height * transform.scale.y)
 				};
 
+				//if (entity.spriteComp.assetId == "chopper-texture")
+				//{
+				//	if (transform.rotation > 45.0)
+				//		std::cout << "teste" << std::endl;
+				//}
+
 				SDL_RenderCopyEx(
 					renderer,
 					assetManager->GetTexture(sprite.assetId),

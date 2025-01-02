@@ -20,7 +20,6 @@ class KeyBoardMovementSystem_v1 : public System
 		KeyBoardMovementSystem_v1()
 		{
 			RequireComponent<KeyBoardControlledComponent_v1>();
-			RequireComponent<SpriteComponent>();
 			RequireComponent<TransformComponent>();
 		}
 		~KeyBoardMovementSystem_v1() = default;
@@ -36,54 +35,25 @@ class KeyBoardMovementSystem_v1 : public System
 			{
 				auto& keyboardControled = entity.GetComponent<KeyBoardControlledComponent_v1>();
 				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& sprite = entity.GetComponent<SpriteComponent>();
 
-				if (entity.HasTag("player"))
+				switch (e.eventType)
 				{
-					switch (e.code)
-					{
-					case SDL_SCANCODE_LEFT:
-						keyboardControled.rotationAngle -= keyboardControled.rotationSpeed * dt;
-						transform.rotation = keyboardControled.rotationAngle;				
-						break;
-					case SDL_SCANCODE_RIGHT:
-						keyboardControled.rotationAngle += keyboardControled.rotationSpeed * dt;
-						transform.rotation = keyboardControled.rotationAngle;
-						break;
-					case SDL_SCANCODE_UP:
-						transform.velocity.x += transform.acceleration * dt * cos(transform.rotation * M_PI / 180.0f) /*keyboardControled.walkSpeed **/;
-						transform.velocity.y += transform.acceleration * dt * sin(transform.rotation * M_PI / 180.0f) /*keyboardControled.walkSpeed**/;
-						break;
-					case SDL_SCANCODE_DOWN:
-						transform.velocity.x -= transform.acceleration * dt * cos(transform.rotation * M_PI / 180.0f) /*keyboardControled.walkSpeed **/;
-						transform.velocity.y -= transform.acceleration * dt * sin(transform.rotation * M_PI / 180.0f) /*keyboardControled.walkSpeed**/;
-						break;
-					}
-
-					//friction
-					if (!e.keys[SDL_SCANCODE_UP] && !e.keys[SDL_SCANCODE_DOWN])
-					{
-						float frictionEffect = transform.friction * dt;
-						
-						if (transform.velocity.x > 0)
-							transform.velocity.x -= frictionEffect;
-						else if (transform.velocity.x < 0)
-							transform.velocity.x += frictionEffect;
-
-						if (transform.velocity.y > 0)
-							transform.velocity.y -= frictionEffect;
-						else if (transform.velocity.y < 0)
-							transform.velocity.y += frictionEffect;
-
-						if (fabs(transform.velocity.x) < frictionEffect)
-							transform.velocity.x = 0;
-						if (fabs(transform.velocity.y) < frictionEffect)
-							transform.velocity.y = 0;
-					}
-
-					transform.position.x += transform.velocity.x * dt;
-				    transform.position.y += transform.velocity.y * dt;
-
+				case SDL_KEYDOWN:
+					if (e.code == SDLK_UP)
+						keyboardControled.walkDirection = +1;
+					if (e.code == SDLK_DOWN)
+						keyboardControled.walkDirection = -1;
+					if (e.code == SDLK_RIGHT)
+						keyboardControled.turnDirection = +1;
+					if (e.code == SDLK_LEFT)
+						keyboardControled.turnDirection = -1;
+					break;
+				case SDL_KEYUP:
+					if (e.code == SDLK_UP || e.code == SDLK_DOWN)
+						keyboardControled.walkDirection = 0;
+					if (e.code == SDLK_RIGHT || e.code == SDLK_LEFT)
+						keyboardControled.turnDirection = 0;
+					break;
 				}
 
 				int paddingLeft = 10;
@@ -114,7 +84,20 @@ class KeyBoardMovementSystem_v1 : public System
 
 		void Update(double deltaT)
 		{
-			dt = deltaT;
+			for (auto& entity : GetSystemEntities())
+			{
+				auto& player = entity.GetComponent<KeyBoardControlledComponent_v1>();
+				auto& transform = entity.GetComponent<TransformComponent>();
+
+				transform.rotation += player.turnDirection * player.turnSpeed * deltaT;
+				
+				float moveStep = player.walkDirection * player.walkSpeed;
+
+				transform.position.x += cos(transform.rotation) * moveStep;
+				transform.position.y += sin(transform.rotation) * moveStep;
+				/*transform.position.x += cos(transform.rotation * M_PI / 180.0f) * moveStep;
+				transform.position.y += sin(transform.rotation * M_PI / 180.0f) * moveStep;*/
+			}
 		}
 };
 

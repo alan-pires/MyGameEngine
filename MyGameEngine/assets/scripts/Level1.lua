@@ -44,7 +44,7 @@ Level = {
                 transform = {
                     position = { x = 242, y = 110 },
                     scale = { x = 1.0, y = 1.0 },
-                    rotation = 0.0, -- degrees
+                    rotation = 45.0, -- degrees
                     velocity = { x = 50.0, y = 50.0 },
                     acceleration = 100.0,
                     friction = 10.0,
@@ -81,9 +81,9 @@ Level = {
                     friendly = true
                 },
                 keyboard_controller = {
-                    rotationAngle = 0.0,
-                    walkSpeed = 200.0,
-                    rotationSpeed = 180.0
+                    --rotationAngle = 0.0,
+                    --walkSpeed = 0.0,
+                    --turnSpeed = 180.0
                     --up_velocity = { x = 0, y = -50 },
                     --right_velocity = { x = 50, y = 0 },
                     --down_velocity = { x = 0, y = 50 },

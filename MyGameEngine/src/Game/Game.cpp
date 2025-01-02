@@ -16,7 +16,6 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/DebugCollisionSystem.h"
 #include "../Systems/KeyBoardMovementSystem_v1.h"
-#include "../Systems/KeyBoardMovementSystem_v2.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
 #include "../Systems/ProjectileLifecycleSystem.h"
@@ -135,20 +134,52 @@ void	Game::ProcessInput()
 		//io.MousePos = ImVec2(mouseX, mouseY);
 		//io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 		//io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
-
-		if (keys[SDL_SCANCODE_ESCAPE])
-			isRunning = false;
-		if (keys[SDL_SCANCODE_UP])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_UP, keys);
-		if (keys[SDL_SCANCODE_RIGHT])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_RIGHT, keys);
-		if (keys[SDL_SCANCODE_DOWN])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_DOWN, keys);
-		if (keys[SDL_SCANCODE_LEFT])
-			eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_LEFT, keys);
-		//if (keys[SDL_SCANCODE_D])
-		//	debugCollision = !debugCollision;
+		 
+		switch (sdlEvent.type)
+		{
+		case SDL_KEYDOWN:
+			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+				isRunning = false;
+			if (sdlEvent.key.keysym.sym == SDLK_UP)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_UP);
+			if (sdlEvent.key.keysym.sym == SDLK_DOWN)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_DOWN);
+			if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_RIGHT);
+			if (sdlEvent.key.keysym.sym == SDLK_LEFT)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_LEFT);
+			break;
+		case SDL_KEYUP:
+			if (sdlEvent.key.keysym.sym == SDLK_UP)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_UP);
+			if (sdlEvent.key.keysym.sym == SDLK_DOWN)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_DOWN);
+			if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_RIGHT);
+			if (sdlEvent.key.keysym.sym == SDLK_LEFT)
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_LEFT);
+		default:
+			break;
+		}
+		
 	}
+}
+
+// nao esta sendo usado no momento
+void	Game::ProcessKeyUpDown()
+{
+	//if (keys[SDL_SCANCODE_ESCAPE])
+	//	isRunning = false;
+	//if (keys[SDL_SCANCODE_UP])
+	//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_UP, keys);
+	//if (keys[SDL_SCANCODE_RIGHT])
+	//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_RIGHT, keys);
+	//if (keys[SDL_SCANCODE_DOWN])
+	//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_DOWN, keys);
+	//if (keys[SDL_SCANCODE_LEFT])
+	//	eventManager->emitEvent<KeyPressedEvent>(SDL_SCANCODE_LEFT, keys);
+	//if (keys[SDL_SCANCODE_D])
+	//	debugCollision = !debugCollision;
 }
 
 // Add the sytems that need to be processed in our game
@@ -161,7 +192,6 @@ void	Game::AddSystems()
 	registry->AddSystem<DebugCollisionSystem>();
 	registry->AddSystem<DamageSystem>();
 	registry->AddSystem<KeyBoardMovementSystem_v1>();
-	//registry->AddSystem<KeyBoardMovementSystem_v2>();
 	registry->AddSystem<CameraMovementSystem>();
 	registry->AddSystem<ProjectileEmitSystem>();
 	registry->AddSystem<ProjectileLifecycleSystem>();
@@ -200,13 +230,11 @@ void	Game::Update()
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
 	registry->GetSystem<MovementSystem>().SubscribeToEvents(eventManager);
 	registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);
-	//registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventManager);
 
 	//Ask all the systems to update
 	registry->GetSystem<MovementSystem>().Update(deltaT);
 	registry->GetSystem<KeyBoardMovementSystem_v1>().Update(deltaT);
-	//registry->GetSystem<KeyBoardMovementSystem_v2>().Update(deltaT);
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().Update(registry);

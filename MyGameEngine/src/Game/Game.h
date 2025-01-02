@@ -42,6 +42,7 @@ class Game
 		void	Destroy();
 		void	Setup();
 		void	AddSystems();
+		void	ProcessKeyUpDown();
 
 		static int windowWidth;
 		static int windowHeight;

@@ -9,6 +9,8 @@ struct TransformComponent
 	glm::vec2 scale;
 	double rotation;
 	glm::vec2 velocity;
+
+
 	double acceleration;
 	double friction;
 
@@ -18,6 +20,7 @@ struct TransformComponent
 		this->scale = scale;
 		this->rotation = rotation;
 		this->velocity = velocity;
+
 		this->acceleration = acceleration;
 		this->friction = friction;
 	}

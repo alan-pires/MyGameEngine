@@ -5,15 +5,20 @@
 
 struct KeyBoardControlledComponent_v1
 {
+	glm::vec2 position;
+	int turnDirection;
+	int walkDirection;
 	float rotationAngle;
 	float walkSpeed;
-	float rotationSpeed;
+	float turnSpeed;
 
-	KeyBoardControlledComponent_v1(float rotationAngle = 0.0, float walkSpeed = 0.0, float rotationSpeed = 0.0)
+	KeyBoardControlledComponent_v1()
 	{
-		this->rotationAngle = rotationAngle;
-		this->walkSpeed = walkSpeed;
-		this->rotationSpeed = rotationSpeed;
+		this->turnDirection = 0;
+		this->walkDirection = 0;
+		this->rotationAngle = 45;
+		this->walkSpeed = 6;
+		this->turnSpeed = 45 ;
 	}
 };
 
