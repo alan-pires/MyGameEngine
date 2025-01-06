@@ -25,7 +25,7 @@ class DamageSystem : public System
 		{
 			Entity a = event.a;
 			Entity b = event.b;
-			Logger::Log("The Damage system received an event Collision between entities " + std::to_string(a.GetId()) + " and " + std::to_string(b.GetId()));
+			//Logger::Log("The Damage system received an event Collision between entities " + std::to_string(a.GetId()) + " and " + std::to_string(b.GetId()));
 
 			if (a.BelongsToGroup("projectiles") && b.HasTag("player"))
 			{

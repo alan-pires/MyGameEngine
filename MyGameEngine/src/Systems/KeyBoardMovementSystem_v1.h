@@ -93,10 +93,8 @@ class KeyBoardMovementSystem_v1 : public System
 				
 				float moveStep = player.walkDirection * player.walkSpeed;
 
-				transform.position.x += cos(transform.rotation) * moveStep;
-				transform.position.y += sin(transform.rotation) * moveStep;
-				/*transform.position.x += cos(transform.rotation * M_PI / 180.0f) * moveStep;
-				transform.position.y += sin(transform.rotation * M_PI / 180.0f) * moveStep;*/
+				transform.position.x += cos(transform.rotation * M_PI / 180.0f) * moveStep;
+				transform.position.y += sin(transform.rotation * M_PI / 180.0f) * moveStep;
 			}
 		}
 };

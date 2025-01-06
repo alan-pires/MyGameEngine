@@ -5,6 +5,7 @@ Level = {
     ----------------------------------------------------
     assets = {
         [0] =
+        { type = "texture", id = "player-texture", file = "./assets/sprites/characters/player.png" },
         { type = "texture", id = "tilemap-texture", file = "./assets/tilemaps/jungle.png" },
         { type = "texture", id = "tilemap-texture_2", file = "./assets/tilemaps/mountain_landscape.png" },
         { type = "texture", id = "chopper-texture", file = "./assets/images/chopper.png" },
@@ -53,7 +54,7 @@ Level = {
                     velocity = { x = 0.0, y = 0.0 }
                 },
                 sprite = {
-                    texture_asset_id = "chopper-texture",
+                    texture_asset_id = "player-texture",
                     width = 32,
                     height = 32,
                     z_index = 4,
@@ -62,7 +63,7 @@ Level = {
                     src_rect_y = 0
                 },
                 animation = {
-                    num_frames = 2,
+                    num_frames = 6,
                     speed_rate = 10 -- fps
                 },
                 boxcollider = {

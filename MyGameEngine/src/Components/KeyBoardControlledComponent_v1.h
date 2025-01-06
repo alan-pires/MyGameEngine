@@ -16,7 +16,7 @@ struct KeyBoardControlledComponent_v1
 	{
 		this->turnDirection = 0;
 		this->walkDirection = 0;
-		this->rotationAngle = 45;
+		this->rotationAngle = 0;
 		this->walkSpeed = 6;
 		this->turnSpeed = 45 ;
 	}
