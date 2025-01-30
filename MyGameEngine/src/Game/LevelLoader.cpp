@@ -7,6 +7,7 @@
 #include "../Components/AnimationComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/KeyBoardControlledComponent_v1.h"
+#include "../Components/KeyBoardControlledComponent_v2.h"
 #include "../Components/CameraFollowComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/HealthComponent.h"
@@ -58,12 +59,14 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 		i++;
 	}
 
+
 	////////////////////////////////////////////////////////////////////////////
 	// Read the level tilemap information
 	////////////////////////////////////////////////////////////////////////////
 	sol::table map = level["tilemap"];
 	std::string mapFilePath = map["map_file"];
-	std::string mapTextureAssetId = map["texture_asset_id"];
+	std::string mapTextureAssetId = map["texture_asset_ids"];
+	std::vector<std::string> textureAssetIds = map["texture_asset_ids"].get<std::vector<std::string>>();
 	int mapNumCols = map["num_cols"];
 	int mapNumRows = map["num_rows"];
 	int tileSize = map["tile_size"];
@@ -83,7 +86,7 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 			Entity tile = registry->CreateEntity();
 			tile.setGroup("tiles");
 			tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-			tile.AddComponent<SpriteComponent>(mapTextureAssetId, tileSize, tileSize, 0, false, srcRectX, srcRectY);
+			tile.AddComponent<SpriteComponent>(textureAssetIds, tileSize, tileSize, 0, false, srcRectX, srcRectY);
 		}
 	}
 	mapFile.close();
@@ -163,11 +166,13 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 			sol::optional<sol::table> sprite = entity["components"]["sprite"];
 			if (sprite != sol::nullopt)
 			{
-				if (entity["components"]["sprite"]["texture_asset_id"].get<std::string>() == "chopper-texture")
+				std::vector<std::string> textureAssetIds = entity["components"]["sprite"]["texture_asset_ids"].get<std::vector<std::string>>();
+				if (std::find(textureAssetIds.begin(), textureAssetIds.end(), "l_right-texture") != textureAssetIds.end()) {
 					newEntity.setTag("player");
+				}
 
 				newEntity.AddComponent<SpriteComponent>(
-					entity["components"]["sprite"]["texture_asset_id"],
+					textureAssetIds,
 					entity["components"]["sprite"]["width"],
 					entity["components"]["sprite"]["height"],
 					entity["components"]["sprite"]["z_index"].get_or(1),
@@ -233,14 +238,25 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 			}
 
 			// KeyboardControlled v1
-			sol::optional<sol::table> keyboardControlled_v1 = entity["components"]["keyboard_controller"];
-			if (keyboardControlled_v1 != sol::nullopt)
+			//sol::optional<sol::table> keyboardControlled_v1 = entity["components"]["keyboard_controller"];
+			//if (keyboardControlled_v1 != sol::nullopt)
+			//{
+			//	newEntity.AddComponent<KeyBoardControlledComponent_v1>(
+			//		/*static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
+			//		static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
+			//		static_cast<float>(entity["components"]["keyboard_controller"]["turnSpeed"].get_or(0.0))*/
+			//		);
+			//}
+
+			// KeyboardControlled v2
+			sol::optional<sol::table> keyboardControlled_v2 = entity["components"]["keyboard_controller"];
+			if (keyboardControlled_v2 != sol::nullopt)
 			{
-				newEntity.AddComponent<KeyBoardControlledComponent_v1>(
+				newEntity.AddComponent<KeyBoardControlledComponent_v2>(
 					/*static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
 					static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
 					static_cast<float>(entity["components"]["keyboard_controller"]["turnSpeed"].get_or(0.0))*/
-					);
+				);
 			}
 
 			// Script
@@ -254,54 +270,3 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 		i++;
 	}
 }
-
-
-//LoadTileMap(registry, "assets/tilemaps/jungle.map");
-
-//// Create a way to add these entities by functions, try to reuse this function if possible.
-//Entity chopper = registry->CreateEntity();
-//chopper.setTag("player");
-//chopper.AddComponent<TransformComponent>(glm::vec2(100.0, 200.0), glm::vec2(1.0, 1.0), 0.0, glm::vec2(0.0, 0.0), 80.0, 10.0);
-//chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-//chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 3);
-//chopper.AddComponent<AnimationComponent>(2, 10, true);
-//chopper.AddComponent<BoxColliderComponent>(32, 32);
-//chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 4000, 30, true);
-//chopper.AddComponent<KeyBoardControlledComponent_v1>(0.0, 200.0f, 180.0f);
-//chopper.AddComponent<CameraFollowComponent>();
-//chopper.AddComponent<HealthComponent>(100);
-//chopper.AddComponent<TextLabelComponent>(glm::vec2(0), "", "arial-font");
-
-//Entity tank = registry->CreateEntity();
-//tank.setGroup("enemies");
-//tank.AddComponent<TransformComponent>(glm::vec2(400.0, 50.0), glm::vec2(1.0, 1.0), 0.0);
-//tank.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
-//tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
-//tank.AddComponent<BoxColliderComponent>(32, 32);
-////tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(0, 150.0), 1000, 2000, 30, false);
-//tank.AddComponent<HealthComponent>(100);
-//tank.AddComponent<TextLabelComponent>(glm::vec2(0), "", "arial-font");
-
-//Entity radar = registry->CreateEntity();
-//radar.AddComponent<TransformComponent>(glm::vec2(700.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-//radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-//radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
-//radar.AddComponent<AnimationComponent>(8, 5, true);
-
-//Entity tree = registry->CreateEntity();
-//tree.setGroup("obstacles");
-//tree.AddComponent<TransformComponent>(glm::vec2(500, 50.0), glm::vec2(1.0, 1.0), 0.0);
-//tree.AddComponent<SpriteComponent>("tree-image", 16, 32, 2);
-//tree.AddComponent<BoxColliderComponent>(16, 32);
-////tree.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-
-//Entity tree2 = registry->CreateEntity();
-//tree2.setGroup("obstacles");
-//tree2.AddComponent<TransformComponent>(glm::vec2(300, 45.0), glm::vec2(1.0, 1.0), 0.0);
-//tree2.AddComponent<SpriteComponent>("tree-image", 16, 32, 2);
-//tree2.AddComponent<BoxColliderComponent>(16, 32);
-////tree2.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-
-//Entity label = registry->CreateEntity();
-//SDL_Color white = { 255, 255, 255 };
-//label.AddComponent<TextLabelComponent>(glm::vec2(Game::windowWidth / 2 - 40, 10), "CHOPPER 1.0", "charriot-font", white, true);

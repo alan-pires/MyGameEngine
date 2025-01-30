@@ -6,7 +6,8 @@
 
 struct SpriteComponent
 {
-	std::string assetId;
+	std::vector<std::string> assetIds;
+	std::string active;
 	int width;
 	int height;
 	int z;
@@ -14,9 +15,10 @@ struct SpriteComponent
 	SDL_Rect srcRect;
 	bool isFixed;
 
-	SpriteComponent(std::string assetId = "", int width = 0, int height = 0, int z =0, bool isFixed = false, int srcRectX = 0, int srcRectY = 0)
+	SpriteComponent(std::vector<std::string> assetIds = {""}, int width = 0, int height = 0, int z = 0, bool isFixed = false, int srcRectX = 0, int srcRectY = 0)
 	{
-		this->assetId = assetId;
+		this->assetIds = std::move(assetIds);
+		this->active = this->assetIds[0];
 		this->width = width;
 		this->height = height;
 		this->z = z;

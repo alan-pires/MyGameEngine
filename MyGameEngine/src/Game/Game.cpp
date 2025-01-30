@@ -16,6 +16,7 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/DebugCollisionSystem.h"
 #include "../Systems/KeyBoardMovementSystem_v1.h"
+#include "../Systems/KeyBoardMovementSystem_v2.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
 #include "../Systems/ProjectileLifecycleSystem.h"
@@ -86,6 +87,8 @@ void	Game::Initialize()
 		return;
 	}
 
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
 	// init the ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -122,6 +125,7 @@ void	Game::ProcessInput()
 {
 	SDL_Event sdlEvent;
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
+	bool up{false}, right{false}, down{false}, left{false};
 
 	while(SDL_PollEvent(&sdlEvent))
 	{
@@ -133,35 +137,67 @@ void	Game::ProcessInput()
 
 		//io.MousePos = ImVec2(mouseX, mouseY);
 		//io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
-		//io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
-		 
+		//io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);		 
+
 		switch (sdlEvent.type)
 		{
 		case SDL_KEYDOWN:
-			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+			if (sdlEvent.type == SDL_QUIT || keys[SDL_SCANCODE_ESCAPE])
 				isRunning = false;
-			if (sdlEvent.key.keysym.sym == SDLK_UP)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_UP);
-			if (sdlEvent.key.keysym.sym == SDLK_DOWN)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_DOWN);
-			if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_RIGHT);
-			if (sdlEvent.key.keysym.sym == SDLK_LEFT)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDLK_LEFT);
+
+			if (keys[SDL_SCANCODE_UP])
+			{
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_UP);
+				up = true;
+			}
+
+			if (keys[SDL_SCANCODE_DOWN])
+			{
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_DOWN);
+				down = true;
+			}
+
+			if (keys[SDL_SCANCODE_RIGHT])
+			{
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_RIGHT);
+				right = true;
+			}
+
+			if (keys[SDL_SCANCODE_LEFT])
+			{
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_LEFT);
+				left = true;
+			}
 			break;
 		case SDL_KEYUP:
-			if (sdlEvent.key.keysym.sym == SDLK_UP)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_UP);
-			if (sdlEvent.key.keysym.sym == SDLK_DOWN)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_DOWN);
-			if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_RIGHT);
-			if (sdlEvent.key.keysym.sym == SDLK_LEFT)
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDLK_LEFT);
+			if (up)
+			{
+				Logger::Log("teste");
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_UP);
+				up = false;
+			}
+
+			if (down)
+			{
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_DOWN);
+				down = false;
+			}
+
+			if (right)
+			{
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_RIGHT);
+				right = false;
+			}
+
+			if (left)
+			{
+				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_LEFT);
+				left = false;
+			}
 		default:
 			break;
 		}
-		
+
 	}
 }
 
@@ -192,6 +228,7 @@ void	Game::AddSystems()
 	registry->AddSystem<DebugCollisionSystem>();
 	registry->AddSystem<DamageSystem>();
 	registry->AddSystem<KeyBoardMovementSystem_v1>();
+	registry->AddSystem<KeyBoardMovementSystem_v2>();
 	registry->AddSystem<CameraMovementSystem>();
 	registry->AddSystem<ProjectileEmitSystem>();
 	registry->AddSystem<ProjectileLifecycleSystem>();
@@ -230,11 +267,13 @@ void	Game::Update()
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
 	registry->GetSystem<MovementSystem>().SubscribeToEvents(eventManager);
 	registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);
+	registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventManager);
 
 	//Ask all the systems to update
 	registry->GetSystem<MovementSystem>().Update(deltaT);
 	registry->GetSystem<KeyBoardMovementSystem_v1>().Update(deltaT);
+	registry->GetSystem<KeyBoardMovementSystem_v2>().Update(deltaT);
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().Update(registry);

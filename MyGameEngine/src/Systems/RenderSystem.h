@@ -66,7 +66,7 @@ class RenderSystem : public System
 
 				SDL_RenderCopyEx(
 					renderer,
-					assetManager->GetTexture(sprite.assetId),
+					assetManager->GetTexture(sprite.active),
 					&srcRect,
 					&dstRect,
 					transform.rotation,

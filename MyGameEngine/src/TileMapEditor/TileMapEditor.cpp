@@ -66,7 +66,7 @@ void TileMapEditor::Initialize()
 void TileMapEditor::Setup()
 {
 	mapArea = { 0, 0, 800, 600 };
-	tileMapTexture = LoadTexture("./assets/tilemaps/jungle.png", renderer);
+	tileMapTexture = LoadTexture("./assets/tilemaps/grass.png", renderer);
 	if (!tileMapTexture)
 	{
 		Logger::Err("Error loading texture");
