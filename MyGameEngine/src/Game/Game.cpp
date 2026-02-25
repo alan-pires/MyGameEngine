@@ -245,6 +245,12 @@ void	Game::Setup()
 	// Create bindings between C++ and Lua
 	registry->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
 
+	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
+	registry->GetSystem<MovementSystem>().SubscribeToEvents(eventManager);
+	registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);
+	registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);
+	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventManager);
+
 	LevelLoader loader;
 	lua.open_libraries(sol::lib::base, sol::lib::math);
 	loader.LoadLevel(lua, registry, assetManager, renderer, 1);
@@ -259,16 +265,14 @@ void	Game::Update()
 	// stores the "previous" frame time (ticks after the SDL_Delay)
 	millisecsPreviousFrame = SDL_GetTicks();
 
-	eventManager->Reset();
+	//eventManager->Reset();
 
-	// URGENTE
-	// TODO - Take this off this Update Function, subscriptions should only happen once in a setup
-	// part of the code, not inside a loop thousand of times.
-	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
-	registry->GetSystem<MovementSystem>().SubscribeToEvents(eventManager);
-	registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);
-	registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);
-	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventManager);
+
+	//registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
+	//registry->GetSystem<MovementSystem>().SubscribeToEvents(eventManager);
+	//registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);
+	//registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);
+	//registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventManager);
 
 	//Ask all the systems to update
 	registry->GetSystem<MovementSystem>().Update(deltaT);
