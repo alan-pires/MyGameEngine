@@ -4,10 +4,10 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 #include <glm/glm.hpp>
-#include <imgui/imgui.h>
+#include <imgui.h>
 //#include <imgui/imgui_impl_sdl.h>
 //#include <imgui/imgui_impl_sdlrenderer.h>
-#include <imgui/imgui_sdl.h>
+//#include <imgui/imgui_sdl.h>
 #include <sol/sol.hpp>
 #include "../Systems/MovementSystem.h"
 #include "../Systems/DamageSystem.h"

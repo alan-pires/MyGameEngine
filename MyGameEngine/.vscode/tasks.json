@@ -1,0 +1,55 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "conan: install",
+      "type": "process",
+      "command": "conan",
+      "args": [
+        "install", ".",
+        "-of", "build",
+        "--build=missing",
+        "-s", "build_type=Debug",
+        "-s", "compiler.cppstd=17",
+        "-pr", "default"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "cmake: clean build dir",
+      "type": "process",
+      "command": "cmake",
+      "args": [
+        "-E", "remove_directory", "build"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "cmake: configure",
+      "type": "process",
+      "command": "cmake",
+      "args": [
+        "-S", ".",
+        "-B", "build",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake"
+      ],
+      "group": "build",
+      "dependsOn": ["cmake: clean build dir", "conan: install"],
+      "problemMatcher": []
+    },
+    {
+      "label": "cmake: build",
+      "type": "process",
+      "command": "cmake",
+      "args": [
+        "--build", "build", "--config", "Debug"
+      ],
+      "group": "build",
+      "dependsOn": "cmake: configure",
+      "problemMatcher": []
+    }
+  ]
+}

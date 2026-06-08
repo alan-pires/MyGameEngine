@@ -37,6 +37,11 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 	lua.script_file("./assets/scripts/Level" + std::to_string(levelNumber) + ".lua");
 
 	sol::table level = lua["Level"];
+	if (!level.valid())
+	{
+		Logger::Err("Error loading the level table from Lua.");
+		return;
+	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Read the level assets
@@ -64,8 +69,13 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 	// Read the level tilemap information
 	////////////////////////////////////////////////////////////////////////////
 	sol::table map = level["tilemap"];
+	if (!map.valid())
+	{
+		Logger::Err("Error loading the tilemap table from Lua.");
+		return;
+	}
+
 	std::string mapFilePath = map["map_file"];
-	std::string mapTextureAssetId = map["texture_asset_ids"];
 	std::vector<std::string> textureAssetIds = map["texture_asset_ids"].get<std::vector<std::string>>();
 	int mapNumCols = map["num_cols"];
 	int mapNumRows = map["num_rows"];
