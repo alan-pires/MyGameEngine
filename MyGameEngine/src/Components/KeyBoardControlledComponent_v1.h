@@ -5,20 +5,21 @@
 
 struct KeyBoardControlledComponent_v1
 {
-	glm::vec2 position;
-	int turnDirection;
-	int walkDirection;
-	float rotationAngle;
-	float walkSpeed;
-	float turnSpeed;
+	// Estados das teclas (true = pressionada)
+	bool upPressed = false;
+	bool downPressed = false;
+	bool leftPressed = false;
+	bool rightPressed = false;
+	
+	float walkSpeed = 200.0f;        // pixels por segundo
+	float acceleration = 800.0f;     // aceleração para movimento suave
+	float friction = 600.0f;         // desaceleração quando solta a tecla
+	
+	glm::vec2 inputDirection = glm::vec2(0, 0);  // direção normalizada do input
 
 	KeyBoardControlledComponent_v1()
 	{
-		this->turnDirection = 0;
-		this->walkDirection = 0;
-		this->rotationAngle = 0;
-		this->walkSpeed = 6;
-		this->turnSpeed = 45 ;
+		// Valores padrão já inicializados acima
 	}
 };
 

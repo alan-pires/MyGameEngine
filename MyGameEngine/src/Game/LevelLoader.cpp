@@ -247,27 +247,19 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 				newEntity.AddComponent<CameraFollowComponent>();
 			}
 
-			// KeyboardControlled v1
-			//sol::optional<sol::table> keyboardControlled_v1 = entity["components"]["keyboard_controller"];
-			//if (keyboardControlled_v1 != sol::nullopt)
-			//{
-			//	newEntity.AddComponent<KeyBoardControlledComponent_v1>(
-			//		/*static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
-			//		static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
-			//		static_cast<float>(entity["components"]["keyboard_controller"]["turnSpeed"].get_or(0.0))*/
-			//		);
-			//}
-
-			// KeyboardControlled v2
-			sol::optional<sol::table> keyboardControlled_v2 = entity["components"]["keyboard_controller"];
-			if (keyboardControlled_v2 != sol::nullopt)
+			// KeyboardControlled v1 (Sistema melhorado com movimento fluido)
+			sol::optional<sol::table> keyboardControlled_v1 = entity["components"]["keyboard_controller"];
+			if (keyboardControlled_v1 != sol::nullopt)
 			{
-				newEntity.AddComponent<KeyBoardControlledComponent_v2>(
-					/*static_cast<float>(entity["components"]["keyboard_controller"]["rotationAngle"].get_or(0.0)),
-					static_cast<float>(entity["components"]["keyboard_controller"]["walkSpeed"].get_or(0.0)),
-					static_cast<float>(entity["components"]["keyboard_controller"]["turnSpeed"].get_or(0.0))*/
-				);
+				newEntity.AddComponent<KeyBoardControlledComponent_v1>();
 			}
+
+			// KeyboardControlled v2 (DESATIVADO - usando v1)
+			//sol::optional<sol::table> keyboardControlled_v2 = entity["components"]["keyboard_controller"];
+			//if (keyboardControlled_v2 != sol::nullopt)
+			//{
+			//	newEntity.AddComponent<KeyBoardControlledComponent_v2>();
+			//}
 
 			// Script
 			sol::optional<sol::table> script = entity["components"]["on_update_script"];

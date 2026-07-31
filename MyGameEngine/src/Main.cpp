@@ -25,22 +25,7 @@ void TileMapEditorRun()
 
 int main(int argc, char* argv[])
 {
-	int option = -1;
-    bool running = true;
-
-    while (running)
-    {
-        std::cout << "Enter 1 for Game and 2 for TileMap Editor or 0 to quit";
-        std::cin >> option;
-
-        if (option == 1 || option == 2 || option == 0)
-            running = false;
-    }
-
-    if (option == 1)
-        GameRun();
-    else if (option == 2)
-        TileMapEditorRun();
+    GameRun();
 
 	return 0;
 }

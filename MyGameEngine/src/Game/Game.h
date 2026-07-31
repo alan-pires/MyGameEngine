@@ -43,6 +43,7 @@ class Game
 		void	Setup();
 		void	AddSystems();
 		void	ProcessKeyUpDown();
+		void	TestLibraries();
 
 		static int windowWidth;
 		static int windowHeight;

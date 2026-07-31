@@ -5,6 +5,8 @@
 #include <SDL_mixer.h>
 #include <glm/glm.hpp>
 #include <imgui.h>
+#include <box2d/box2d.h>
+#include <raylib.h>
 //#include <imgui/imgui_impl_sdl.h>
 //#include <imgui/imgui_impl_sdlrenderer.h>
 //#include <imgui/imgui_sdl.h>
@@ -124,80 +126,19 @@ void	Game::Run()
 void	Game::ProcessInput()
 {
 	SDL_Event sdlEvent;
-	const Uint8* keys = SDL_GetKeyboardState(NULL);
-	bool up{false}, right{false}, down{false}, left{false};
 
 	while(SDL_PollEvent(&sdlEvent))
 	{
-		// ImGui SDL input
-		//ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
-		//ImGuiIO& io = ImGui::GetIO();
-		//int mouseX, mouseY;
-		//const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
-
-		//io.MousePos = ImVec2(mouseX, mouseY);
-		//io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
-		//io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);		 
-
 		switch (sdlEvent.type)
 		{
-		case SDL_KEYDOWN:
-			if (sdlEvent.type == SDL_QUIT || keys[SDL_SCANCODE_ESCAPE])
-				isRunning = false;
-
-			if (keys[SDL_SCANCODE_UP])
-			{
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_UP);
-				up = true;
-			}
-
-			if (keys[SDL_SCANCODE_DOWN])
-			{
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_DOWN);
-				down = true;
-			}
-
-			if (keys[SDL_SCANCODE_RIGHT])
-			{
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_RIGHT);
-				right = true;
-			}
-
-			if (keys[SDL_SCANCODE_LEFT])
-			{
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYDOWN, SDL_SCANCODE_LEFT);
-				left = true;
-			}
+		case SDL_QUIT:
+			isRunning = false;
 			break;
-		case SDL_KEYUP:
-			if (up)
-			{
-				Logger::Log("teste");
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_UP);
-				up = false;
-			}
-
-			if (down)
-			{
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_DOWN);
-				down = false;
-			}
-
-			if (right)
-			{
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_RIGHT);
-				right = false;
-			}
-
-			if (left)
-			{
-				eventManager->emitEvent<KeyPressedEvent>(SDL_KEYUP, SDL_SCANCODE_LEFT);
-				left = false;
-			}
-		default:
+		case SDL_KEYDOWN:
+			if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+				isRunning = false;
 			break;
 		}
-
 	}
 }
 
@@ -228,7 +169,7 @@ void	Game::AddSystems()
 	registry->AddSystem<DebugCollisionSystem>();
 	registry->AddSystem<DamageSystem>();
 	registry->AddSystem<KeyBoardMovementSystem_v1>();
-	registry->AddSystem<KeyBoardMovementSystem_v2>();
+	// registry->AddSystem<KeyBoardMovementSystem_v2>();  // DESATIVADO - usando v1
 	registry->AddSystem<CameraMovementSystem>();
 	registry->AddSystem<ProjectileEmitSystem>();
 	registry->AddSystem<ProjectileLifecycleSystem>();
@@ -247,13 +188,49 @@ void	Game::Setup()
 
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventManager);
 	registry->GetSystem<MovementSystem>().SubscribeToEvents(eventManager);
-	registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);
-	registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);
+	// registry->GetSystem<KeyBoardMovementSystem_v1>().SubscribeToEvents(eventManager);  // Não precisa mais - gerencia estado internamente
+	// registry->GetSystem<KeyBoardMovementSystem_v2>().SubscribeToEvents(eventManager);  // DESATIVADO
 	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventManager);
 
 	LevelLoader loader;
 	lua.open_libraries(sol::lib::base, sol::lib::math);
 	loader.LoadLevel(lua, registry, assetManager, renderer, 1);
+
+	// Testar bibliotecas integradas
+	TestLibraries();
+}
+
+void	Game::TestLibraries()
+{
+	// Box2D Hello World (Box2D 2.4.1 API)
+	b2World* world = new b2World(b2Vec2(0.0f, 9.8f));
+	Logger::Log("✓ Box2D World Created Successfully! Gravity: 9.8 m/s²");
+
+	// Criando um corpo de teste
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(5.0f, 5.0f);
+	b2Body* body = world->CreateBody(&bodyDef);
+	Logger::Log("✓ Box2D Dynamic Body Created at (5.0, 5.0)");
+
+	delete world;
+	Logger::Log("✓ Box2D Test Complete - Library is working!");
+
+	// Raylib Hello World
+	Logger::Log("✓ Raylib Version: " + std::string(RAYLIB_VERSION));
+	
+	// Testar estruturas básicas da raylib
+	Vector2 testVec = {10.0f, 20.0f};
+	Logger::Log("✓ Raylib Vector2 created: x=" + std::to_string(testVec.x) + 
+	           " y=" + std::to_string(testVec.y));
+	
+	// Testar estrutura de cor
+	Color testColor = {255, 0, 128, 255};
+	Logger::Log("✓ Raylib Color created: R=" + std::to_string(testColor.r) + 
+	           " G=" + std::to_string(testColor.g) + 
+	           " B=" + std::to_string(testColor.b));
+	
+	Logger::Log("✓ Raylib Library is working!");
 }
 
 void	Game::Update()
@@ -276,8 +253,8 @@ void	Game::Update()
 
 	//Ask all the systems to update
 	registry->GetSystem<MovementSystem>().Update(deltaT);
-	registry->GetSystem<KeyBoardMovementSystem_v1>().Update(deltaT);
-	registry->GetSystem<KeyBoardMovementSystem_v2>().Update(deltaT);
+	registry->GetSystem<KeyBoardMovementSystem_v1>().Update(deltaT, eventManager);
+	// registry->GetSystem<KeyBoardMovementSystem_v2>().Update(deltaT);  // DESATIVADO
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventManager);
 	registry->GetSystem<ProjectileEmitSystem>().Update(registry);

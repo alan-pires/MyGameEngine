@@ -9,9 +9,9 @@
 
 enum LogType
 {
-	LOG_INFO,
-	LOG_WARNING,
-	LOG_ERROR
+	MGE_LOG_INFO,
+	MGE_LOG_WARNING,
+	MGE_LOG_ERROR
 };
 
 struct LogEntry

@@ -14,7 +14,9 @@ class MyGameEngineConan(ConanFile):
         "lua/5.4.6",
         "glm/0.9.9.8",
         "sol2/3.2.3",
-        "imgui/1.89.8"
+        "imgui/1.89.8",
+        "box2d/2.4.1",
+        "gtest/1.14.0"
     ]
     generators = "CMakeToolchain", "CMakeDeps"
     default_options = {
@@ -23,7 +25,9 @@ class MyGameEngineConan(ConanFile):
         "sdl_ttf/*:shared": False,
         "sdl_mixer/*:shared": False,
         "lua/*:shared": False,
-        "imgui/*:shared": False
+        "imgui/*:shared": False,
+        "box2d/*:shared": False,
+        "gtest/*:shared": False
     }
 
     def layout(self):
